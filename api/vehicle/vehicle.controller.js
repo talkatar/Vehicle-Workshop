@@ -74,6 +74,7 @@ async function insertVehicle(req, res) {
     console.log(req.body);
     const {  lisenceNum, company,fullname,phoneNumber } = req.body
     const vehicle = await vehicleService.getById(lisenceNum)
+    console.log('insertVehicle',vehicle._id);
     const vehicleInGarage = await garageService.getById(lisenceNum)
 
     if(!vehicle) {
@@ -82,8 +83,8 @@ async function insertVehicle(req, res) {
     
     else if (vehicle.company !== company.trim()) {
       await garageService.insertBlackList(req.body)
-      const garage = await garageService.query();
-      res.json({ error: 'The vehicle is stolen! Your car is in the blacklist!', garage });
+      const stolenVehicle = req.body
+      res.json({ error: 'The vehicle is stolen! Your car is in the blacklist!', stolenVehicle });
       return
     }
 
@@ -93,8 +94,10 @@ async function insertVehicle(req, res) {
     }
 
     else {
-      await garageService.insertVehicle(vehicle,fullname,phoneNumber)
-      res.json({garage:await garageService.query()})
+      await garageService.insertVehicle(vehicle, fullname, phoneNumber);
+      const insertedVehicle = await garageService.getById(lisenceNum);
+    
+      res.json({ vehicle: insertedVehicle });
     }
   }
 

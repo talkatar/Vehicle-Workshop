@@ -13,7 +13,6 @@ class Garage {
     insertCar(licenseNum,airQuantity) {
 
         const vehicleType = checkingVehicleType(licenseNum)
-        // vehicleType.setPrototypeOf(myObject, myClassInstance)
         switch (vehicleType) {
             case 'car':
               if (pressure < 30) {

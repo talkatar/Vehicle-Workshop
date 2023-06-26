@@ -1,7 +1,7 @@
 const express = require('express')
 const { requireAuth, requireAdmin } = require('../../middlewares/requireAuth.middleware')
 const { log } = require('../../middlewares/logger.middleware')
-const { addGarage,getGarage,getVehicleById,removeVehicle } = require('./garage.controller')
+const { addGarage,getGarage,getVehicleById,removeVehicle,updateVehicle } = require('./garage.controller')
 const router = express.Router()
 
 // middleware that is specific to this router
@@ -11,6 +11,7 @@ router.get('/', log, getGarage)
 router.post('/', requireAuth, addGarage)
 router.get('/:id', getVehicleById)
 router.delete('/:id',  removeVehicle)
+router.put('/', requireAuth, updateVehicle)
 
 
 module.exports = router

@@ -6,17 +6,27 @@
         this.maxAirPress = maxAirPress
     }
 
-     inflateWheel(extraAir) {
-        try {
-            if (!isNaN(extraAir) && this.currAirPress + extraAir <= this.maxAirPress && extraAir > 0) {
-                this.currAirPress = this.currAirPress + extraAir
-            } else {
-                throw new Error('Invalid air pressure was provided ')
-            }
-        } catch (error) {
-            console.log(error.message)
-        }
-    }
+    inflateWheel(updatedAirPress) {
+        const deltaAir = updatedAirPress - this.currAirPress
+        return new Promise((resolve,reject) => {
+        setTimeout(() => {
+          try{
+            this.currAirPress = parseInt(updatedAirPress, 10)
+            resolve()
+
+          }
+          catch{
+            reject(err)
+          }
+
+        }, deltaAir * 500)
+      })
+      }
+
+
+
+
+
 }
 
 module.exports = Wheel

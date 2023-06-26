@@ -1,13 +1,5 @@
-export const utilService = {
-    makeId,
-    makeLorem,
-    getRandomIntInclusive,
-    debounce,
-    randomPastTime,
-    saveToStorage,
-    loadFromStorage,
-    prettyJSON
-}
+
+
 
 function makeId(length = 6) {
     var txt = ''
@@ -79,4 +71,17 @@ function prettyJSON(obj) {
         .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
         .replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(jsonLine, _replacer)
+}
+
+
+
+module.exports = {
+    makeId,
+    makeLorem,
+    getRandomIntInclusive,
+    debounce,
+    randomPastTime,
+    saveToStorage,
+    loadFromStorage,
+    prettyJSON
 }

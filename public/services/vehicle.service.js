@@ -31,21 +31,20 @@ async function query(filterBy = { txt: '', price: 0 }) {
 async function loadVehicles() {
 
     let vehicles = [
-        new Motorbike('Dukati', 'Maisto', '108AB123', 80, 'Waiting', 0, '95', 50, 40, 'A1', 40),
+        new Motorbike('Dukati', 'Maisto', '108AB123', 80, '', 0, '95', 50, 40, 'A1', 40),
         // constructor(company, model, licenseNum, energyPerc, treatStatus, treatPrice, fuelType, tankCapacity, licenseType, currFuelQuantity,licenseType, engineCapacity) {
-        new ElectricMotorbike('Energica', 'R-i', '108ABA23', 60, 'Waiting', 0, 10, 6, 'A2', 125),
+        new ElectricMotorbike('Energica', 'R-i', '108ABA23', 60, '', 0, 10, 6, 'A2', 125),
         // constructor(company, model, licenseNum, energyPerc,treatStatus,treatPrice,maxBatteryLife,currBatteryLife,licenseType, engineCapacity) {
-        new Car('Bmw', 'X6', '10822123', 30, 'Waiting', 0, '96', 100, 'white', 4, 30),
+        new Car('Bmw', 'X6', '10822123', 30, '', 0, '96', 100, 'white', 4, 30),
         // constructor(company, model, licenseNum, energyPerc, treatStatus,treatPrice, fuelType, tankCapacity, color, numOfDoors, currFuelQuantity) {
-        new ElectricCar('Tesla', 'Model 3', '90122123', 20, 'Waiting', 0, 20, 4, 'Red', 4),
+        new ElectricCar('Tesla', 'Model 3', '90122123', 20, '', 0, 20, 4, 'Red', 4),
         // constructor(company, model, licenseNum, energyPerc, treatStatus, treatPrice, maxBatteryLife, currBatteryLife, color, numOfDoors) {
-        new Truck('Volvo', 'xc-40', '80123416', 40, 'Waiting', 0, '98', 80, 200, true, 700),
+        new Truck('Volvo', 'xc-40', '80123416', 40, '', 0, '98', 80, 200, true, 700),
         // constructor(company, model, licenseNum, energyPerc,treatStatus,treatPrice, fuelType,currFuelQuantity, tankCapacity, isDrivenDangerGoods, rearChargerCapacity) {
-        new Drone('Cando', 'Fer', '12345', 30, 'Waiting', 0, 2, 0.6, 2, 'Joystick-providing physical sensations to the user, such as vibrations or resistance, to enhance the gaming experience'),
+        new Drone('Cando', 'Fer', '12345', 30, '', 0, 2, 0.6, 2, 'Joystick-providing physical sensations to the user, such as vibrations or resistance, to enhance the gaming experience'),
         // constructor(company, model, licenseNum, energyPerc,treatStatus,treatPrice, maxBatteryLife,currBatteryLife, numOfEngines, controlInterface) {
     ]
 
-    console.log(vehicles);
     logger.debug(vehicles)
 
 

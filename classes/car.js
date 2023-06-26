@@ -3,8 +3,8 @@ const Wheel = require('./wheel.js')
 
 class Car extends Vehicle {
   numOfWheels = 4
-  constructor(company, model, licenseNum, energyPerc, treatStatus, treatPrice, remainTreats, imgUrl, fuelType, tankCapacity, color, numOfDoors, currFuelQuantity) {
-    super(company, model, licenseNum, energyPerc, treatStatus, treatPrice, remainTreats, imgUrl)
+  constructor(company, model, licenseNum, energyPerc, repairStatus, repairPrice, remainTreats, imgUrl, fuelType, tankCapacity, color, numOfDoors, currFuelQuantity) {
+    super(company, model, licenseNum, energyPerc, repairStatus, repairPrice, remainTreats, imgUrl)
     this.fuelType = fuelType
     this.currFuelQuantity = currFuelQuantity
     this.tankCapacity = tankCapacity
@@ -16,17 +16,6 @@ class Car extends Vehicle {
 
   }
 
-  addFuel(quantity) {
-    try {
-      if (!isNaN(quantity) && this.currFuelQuantity + quantity <= this.maxFuelQuantity && quantity > 0) {
-        this.currFuelQuantity += quantity
-        this.energyPerc = (this.currFuelQuantity / this.tankCapacity)
-      } else {
-        throw new Error('Invalid fuel quantity was provided');
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
+
 }
 module.exports = Car

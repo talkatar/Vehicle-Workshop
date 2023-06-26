@@ -5,7 +5,6 @@ async function getGarage(req, res) {
   try {
     logger.debug('Getting garage')
     const garage = await garageService.query()
-    console.log('controller',garage);
     res.json(garage)
   } catch (err) {
     logger.error('Failed to get garage', err)
@@ -24,10 +23,12 @@ async function addGarage(req, res) {
     res.status(500).send({ err: 'Failed to add garage' })
   }
 }
+
+
+
 async function getVehicleById(req, res) {
   try {
     const vehicleId = req.params.id
-    console.log('vehicleId',vehicleId);
     const vehicle = await garageService.getById(vehicleId)
     res.json(vehicle)
   } catch (err) {
@@ -47,10 +48,29 @@ async function removeVehicle(req, res) {
     res.status(500).send({ err: 'Failed to remove vehicle' })
   }
 }
+async function updateVehicle(req, res) {
+  try {
+    console.log('updateVehicle');
+
+    console.log('updateVehicle',req.body);
+    const updatedVehicle = await garageService.update(req.body)
+    console.log('updatedVehicletal',updatedVehicle);
+    res.json(updatedVehicle)
+  } catch (err) {
+    logger.error('Failed to update vehicle', err)
+    res.status(500).send({ err: 'Failed to update vehicle' })
+
+  }
+}
+
+
+
+
 
 module.exports = {
   addGarage,
   getGarage,
   getVehicleById,
-  removeVehicle
+  removeVehicle,
+  updateVehicle
 }
