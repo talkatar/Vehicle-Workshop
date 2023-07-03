@@ -18,51 +18,47 @@ async function loadVehicles() {
     let vehicles = await collection.find({}).toArray()
 
     if (vehicles.length === 0) {
-     vehicles = [
-        new Motorbike('Dukati', 'Maisto', '108AA123', 80, '', 0,null,'https://res.cloudinary.com/dm72lanye/image/upload/v1687243518/hyw1vc2uowuucnmhgtc9.jpg', '95', 50, 40, 'A1', 40),
-        // constructor(company, model, licenseNum, energyPerc, treatStatus, treatPrice, fuelType, tankCapacity, licenseType, currFuelQuantity,licenseType, engineCapacity) {
-        new ElectricMotorbike('Energica', 'R-i', '108BBB23', 60, '', 0,null,'https://res.cloudinary.com/dm72lanye/image/upload/v1687243567/iu2unenwmmo4xrylkkt6.jpg', 10, 6, 'A2', 125),
-        // constructor(company, model, licenseNum, energyPerc,treatStatus,treatPrice,maxBatteryLife,currBatteryLife,licenseType, engineCapacity) {
-        new Car('Bmw', 'X6', '10822123', 30, '', 0,null,'https://res.cloudinary.com/dm72lanye/image/upload/v1687243398/auwfms1of4p41fewirpw.jpg', '96', 100, 'white', 4, 30),
-        // constructor(company, model, licenseNum, energyPerc, treatStatus,treatPrice, fuelType, tankCapacity, color, numOfDoors, currFuelQuantity) {
-        new ElectricCar('Tesla', 'Model 3', '90122123', 20, '', 0,null,'https://res.cloudinary.com/dm72lanye/image/upload/v1687243567/n8n7gdevyeywf6ix81kj.jpg', 20, 4, 'Red', 4),
-        // constructor(company, model, licenseNum, energyPerc, treatStatus, treatPrice, maxBatteryLife, currBatteryLife, color, numOfDoors) {
-        new Truck('Volvo', 'xc-40', '80523416', 40, '', 0,null,'https://res.cloudinary.com/dm72lanye/image/upload/v1687243567/jrexdzrkyzcvfnyqhhbm.jpg', '98', 80, 200, "yes", 700),
-        // constructor(company, model, licenseNum, energyPerc,treatStatus,treatPrice, fuelType,currFuelQuantity, tankCapacity, isDrivenDangerGoods, rearChargerCapacity) {
-        new Drone('Cando', 'Fer', '12345', 30, '', 0,null,'https://res.cloudinary.com/dm72lanye/image/upload/v1687243566/qfvoaeuq865ybst9pme3.jpg', 2, 1, 2, 'Joystick-providing physical sensations to the user, such as vibrations or resistance, to enhance the gaming experience'),
-        // constructor(company, model, licenseNum, energyPerc,treatStatus,treatPrice, maxBatteryLife,currBatteryLife, numOfEngines, controlInterface) {
-    ]
-    await collection.insertMany(vehicles);
-}
-else return
+        vehicles = [
+            new Motorbike('Dukati', 'Maisto', '108AA123', 80, '', 0, null, 'https://res.cloudinary.com/dm72lanye/image/upload/v1687243518/hyw1vc2uowuucnmhgtc9.jpg', '95', 50, 40, 'A1', 40),
+            // constructor(company, model, licenseNum, energyPerc, treatStatus, treatPrice, fuelType, tankCapacity, licenseType, currFuelQuantity,licenseType, engineCapacity) {
+            new ElectricMotorbike('Energica', 'R-i', '108BBB23', 60, '', 0, null, 'https://res.cloudinary.com/dm72lanye/image/upload/v1687243567/iu2unenwmmo4xrylkkt6.jpg', 10, 6, 'A2', 125),
+            // constructor(company, model, licenseNum, energyPerc,treatStatus,treatPrice,maxBatteryLife,currBatteryLife,licenseType, engineCapacity) {
+            new Car('Bmw', 'X6', '10822123', 30, '', 0, null, 'https://res.cloudinary.com/dm72lanye/image/upload/v1687243398/auwfms1of4p41fewirpw.jpg', '96', 100, 'white', 4, 30),
+            // constructor(company, model, licenseNum, energyPerc, treatStatus,treatPrice, fuelType, tankCapacity, color, numOfDoors, currFuelQuantity) {
+            new ElectricCar('Tesla', 'Model 3', '90122123', 20, '', 0, null, 'https://res.cloudinary.com/dm72lanye/image/upload/v1687243567/n8n7gdevyeywf6ix81kj.jpg', 20, 4, 'Red', 4),
+            // constructor(company, model, licenseNum, energyPerc, treatStatus, treatPrice, maxBatteryLife, currBatteryLife, color, numOfDoors) {
+            new Truck('Volvo', 'xc-40', '80523416', 40, '', 0, null, 'https://res.cloudinary.com/dm72lanye/image/upload/v1687243567/jrexdzrkyzcvfnyqhhbm.jpg', '98', 80, 200, "yes", 700),
+            // constructor(company, model, licenseNum, energyPerc,treatStatus,treatPrice, fuelType,currFuelQuantity, tankCapacity, isDrivenDangerGoods, rearChargerCapacity) {
+            new Drone('Cando', 'Fer', '12345', 30, '', 0, null, 'https://res.cloudinary.com/dm72lanye/image/upload/v1687243566/qfvoaeuq865ybst9pme3.jpg', 2, 1, 2, 'Joystick-providing physical sensations to the user, such as vibrations or resistance, to enhance the gaming experience'),
+            // constructor(company, model, licenseNum, energyPerc,treatStatus,treatPrice, maxBatteryLife,currBatteryLife, numOfEngines, controlInterface) {
+        ]
+        await collection.insertMany(vehicles);
     }
+    else return
+}
 
 
 
-async function query(filterBy={txt:''}) {
+async function query(filterBy = { txt: '' }) {
     try {
         const criteria = {
             vendor: { $regex: filterBy.txt, $options: 'i' }
         }
-        console.log('vehicle query' );
+        console.log('vehicle query');
         const collection = await dbService.getCollection('vehicle')
 
         var vehicles = await collection.find({}).toArray()
         return vehicles
     } catch (err) {
         logger.error('cannot find vehicles', err)
-        throw err 
+        throw err
     }
 }
 
 async function getById(vehicleId) {
     try {
-        console.log('getById',vehicleId);
-
         const collection = await dbService.getCollection('vehicle')
         const vehicle = await collection.findOne({ licenseNum: vehicleId })
-        console.log('getByIdvehicle',vehicle);
-
         if (!vehicle) {
             return null
         }
@@ -102,7 +98,7 @@ async function update(vehicle) {
             price: vehicle.price
         }
         const collection = await dbService.getCollection('vehicle')
-        
+
         await collection.updateOne({ _id: ObjectId(vehicle._id) }, { $set: vehicleToSave })
         return vehicle
     } catch (err) {

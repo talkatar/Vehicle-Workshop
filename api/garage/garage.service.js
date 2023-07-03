@@ -2,40 +2,157 @@ const dbService = require('../../services/db.service')
 const logger = require('../../services/logger.service')
 const utilService = require('../../services/util.service')
 const ObjectId = require('mongodb').ObjectId
-const vehicleService = require('../vehicle/vehicle.service')
 const Garage = require('../../classes/garage.js')
 const Vehicle = require('../../classes/vehicle.js')
 const Wheel = require('../../classes/wheel.js')
+var gGarage
 
-
-
-
-async function query() {
+async function query(filterBy) {
     try {
         const collection = await dbService.getCollection('garage')
-        const garage = await collection.find({}).toArray();
-        if (!garage.length === 0) return null
+        const garage = await collection.find({}).toArray()
+        if (!garage.length) return null
+
+        if (filterBy) {
+            if (filterBy.repairStatus) {
+                const regex = new RegExp(filterBy.repairStatus, 'i')
+                garage[0].vehicles = garage[0].vehicles.filter(vehicle => regex.test(vehicle.repairStatus))
+            }
+
+            if (filterBy.remainRepairs !== undefined) {
+                garage[0].vehicles = garage[0].vehicles.filter(
+                    vehicle => vehicle.remainRepairs === +filterBy.remainRepairs)
+            }
+        }
+
+
+        if (!gGarage) {
+            gGarage = { ...garage[0] }
+            Object.setPrototypeOf(gGarage, Garage.prototype)
+            console.log('query',gGarage);
+
+        }
         return garage
-    } catch (err) {
+    }
+
+    catch (err) {
         logger.error('cannot find garage', err)
         throw err
     }
 }
 
+async function activateWorkers(repairDetails) {
+    try {
+        if (!gGarage) {
+            let garage = (await query())[0]
+            gGarage = { ...garage }
+            Object.setPrototypeOf(gGarage, Garage.prototype)
+        }
+        console.log('activateWorkers',gGarage);
 
+        await gGarage.checkingAvailability(repairDetails)
+        return  await gGarage.assignWorker(repairDetails)
 
+    }
+
+    catch (err) {
+        logger.error(`cannot activate workers `, err);
+        throw err;
+    }
+}
+
+async function update(repairDetails) {
+    try {
+        console.log('updategGarage',gGarage);
+        const { licenseNum, updatedBatteryLife, updatedFuelQuantity, updatedAirQuantity } = repairDetails
+        let vehicle = await getById(licenseNum)
+        Object.setPrototypeOf(vehicle, Vehicle.prototype)
+        // let gGarage = (await query())[0]
+        Object.setPrototypeOf(gGarage, Garage.prototype)
+        vehicle.repairStatus = "On Progress"
+
+        if (updatedAirQuantity && gGarage.numOfInflationStations) {
+            gGarage.numOfInflationStations--
+            const wheels = vehicle.wheels
+            const numWheels = wheels.length
+            vehicle.repairStatus = "Inflation station"
+
+            for (let i = 0; i < numWheels; i++) {
+                const wheel = wheels[i]
+                Object.setPrototypeOf(wheel, Wheel.prototype)
+                vehicle.repairPrice += parseInt(updatedAirQuantity, 10) * 0.1
+                try {
+                     wheel.inflateWheel(updatedAirQuantity)
+                }
+                catch {
+                    vehicle.wheels.forEach(wheel => wheel.currAirPress = 0)
+                     wheel.inflateWheel(vehicle.wheels[0].maxAirPress)
+                    const newTire = 350
+                    vehicle.repairPrice += newTire * numWheels + parseInt(vehicle.wheels[0].maxAirPress, 10) * 0.1
+                }
+            }
+            vehicle.repairStatus = "On Progress"
+            repairDetails.updatedAirQuantity = 0
+            var updatedAir=0
+
+            gGarage.numOfInflationStations++
+            if (vehicle.wheels[0].currAirPress === vehicle.wheels[0].maxAirPress) vehicle.remainRepairs--
+
+        }
+
+        if (updatedFuelQuantity && gGarage.numOfFuelStations) {
+            vehicle.repairStatus = "Fuel station"
+            gGarage.numOfFuelStations--
+             vehicle.refuelVehicle(updatedFuelQuantity)
+            repairDetails.updatedFuelQuantity = 0
+            gGarage.numOfFuelStations++
+            vehicle.repairStatus = "On Progress"
+        }
+
+        else if (updatedBatteryLife && gGarage.numOfChargingStations) {
+            vehicle.repairStatus = "Charging station"
+            gGarage.numOfChargingStations--
+             vehicle.refuelVehicle(updatedBatteryLife)
+            repairDetails.updatedFuelQuantity = 0
+            gGarage.numOfChargingStations++
+            vehicle.repairStatus = "On Progress"
+        }
+
+        if (!vehicle.remainRepairs) vehicle.repairStatus = "Ready"
+        if(!updatedBatteryLife&&!updatedAir||!updatedFuelQuantity&&!updatedAir){
+            const collection = await dbService.getCollection('garage')
+            await collection.updateOne({ 'vehicles.licenseNum': vehicle.licenseNum }, { $set: { 'vehicles.$': vehicle } })
+            return vehicle
+
+        }
+
+        else  {
+            gGarage.numOfWorkers--
+            gGarage.checkingAvailability(repairDetails)
+        }
+
+    }
+
+    catch (err) {
+        logger.error(`cannot update vehicle `, err);
+        throw err;
+    }
+}
 
 async function add(garage) {
     try {
         const collection = await dbService.getCollection('garage')
         const newGarage = new Garage(garage.numOfWorkers, garage.numOfFuelStations, garage.numOfInflationStations, garage.numOfChargingStations)
+        if (!gGarage) gGarage = newGarage
         collection.insertOne(newGarage)
+        gGarage = { ...newGarage }
         return newGarage
     } catch (err) {
         logger.error('cannot insert garage', err)
         throw err
     }
 }
+
 
 async function getById(vehicleId) {
     try {
@@ -59,11 +176,10 @@ async function insertVehicle(vehicle, fullname, phoneNumber) {
     try {
         const collection = await dbService.getCollection('garage')
         vehicle.remainRepairs = 0
-        vehicle.type=checkingVehicleType(vehicle.licenseNum)
-        console.log('vehicle.type',vehicle.type,);
+        vehicle.type = checkingVehicleType(vehicle.licenseNum)
         if (vehicle.currFuelQuantity !== vehicle.tankCapacity || vehicle.currBatteryLife !== vehicle.maxBatteryLife) vehicle.remainRepairs++
-        if (vehicle.wheels&&averageAirPressure(vehicle.wheels) !== 100) vehicle.remainRepairs++
-        const vehicleToSave = { ...vehicle, fullname, phoneNumber, repairStatus: 'Waiting', repairPrice: 0,vehicleType:vehicle.type};
+        if (vehicle.wheels && averageAirPressure(vehicle.wheels) !== 100) vehicle.remainRepairs++
+        const vehicleToSave = { ...vehicle, fullname, phoneNumber, repairStatus: 'Waiting', repairPrice: 0, vehicleType: vehicle.type };
         await collection.updateOne({}, { $push: { vehicles: vehicleToSave } })
     } catch (err) {
         logger.error(`cannot update garage `, err)
@@ -87,57 +203,6 @@ async function remove(vehicleId) {
 }
 
 
-
-async function update(repairDetails) {
-    try {
-        const { licenseNum, updatedBatteryLife, updatedFuelQuantity, updatedAirPressure } = repairDetails
-        let vehicle = await getById(licenseNum)
-        Object.setPrototypeOf(vehicle, Vehicle.prototype);
-        vehicle.repairStatus = "On Progress"
-
-        if (updatedAirPressure) {
-            const wheels = vehicle.wheels
-            const numWheels = wheels.length
-            vehicle.repairStatus = "Inflation station"
-            for (let i = 0; i < numWheels; i++) {
-                const wheel = wheels[i]
-                Object.setPrototypeOf(wheel, Wheel.prototype)
-                const deltaAir = updatedAirPressure - wheel.currAirPress
-                vehicle.repairPrice += parseInt(deltaAir, 10) * 0.1
-                try {
-                    await wheel.inflateWheel(updatedAirPressure)
-                }
-                catch {
-                    await wheel.inflateWheel(this.maxAirPress)
-                    const newTire = 350
-                    vehicle.repairPrice += newTire * numWheels + parseInt(this.maxAirPress - (deltaAir + updatedAirPressure), 10) * 0.1
-                }
-            }
-        }
-
-        
-        if (updatedFuelQuantity) {
-            await vehicle.refuelVehicle(updatedFuelQuantity)
-        }
-        else if (updatedBatteryLife) {
-            await vehicle.refuelVehicle(updatedBatteryLife)
-
-        }
-
-        if (!vehicle.remainRepairs) vehicle.repairStatus = "Ready"
-        const collection = await dbService.getCollection('garage')
-        await collection.updateOne({ 'vehicles.licenseNum': vehicle.licenseNum }, { $set: { 'vehicles.$': vehicle } });
-        return vehicle
-
-    }
-
-    catch (err) {
-        logger.error(`cannot update vehicle `, err);
-        throw err;
-    }
-}
-
-
 async function insertBlackList(vehicle) {
     try {
         console.log(vehicle);
@@ -149,32 +214,18 @@ async function insertBlackList(vehicle) {
     }
 }
 
-// async function getGarageCollection() {
-//     return await dbService.getCollection('garage')
-// }
-
-
 
 function checkingVehicleType(licenseNum) {
-    console.log('checkingVehicleType');
 
     const countA = (licenseNum.match(/A/g) || []).length
-    console.log('countA',countA);
     const countB = (licenseNum.match(/B/g) || []).length
-    console.log('countB',countB);
     const lastLetter = licenseNum.charAt(licenseNum.length - 1);
     const firstTwoLetters = licenseNum.slice(0, 2)
     const licenseNumLen = licenseNum.length
 
-    
-    console.log(/^[0-9]+$/.test(licenseNum));
-    console.log(firstTwoLetters);
-    console.log(lastLetter);
-
     if (licenseNumLen === 8) {
 
-        if (/[0123456789]/.test(licenseNum)&&/[AB]/.test(licenseNum)) {
-            console.log('1');
+        if (/[0123456789]/.test(licenseNum) && /[AB]/.test(licenseNum)) {
 
             if ((countA % 2 === 0 && countA !== 0) || (countB % 2 === 0 && countB !== 0)) return 'Motorbike';
             else if (countA % 2 !== 0 || countB % 2 !== 0) return 'Electric motorbike'
@@ -182,8 +233,7 @@ function checkingVehicleType(licenseNum) {
         }
 
         else if (/^[0-9]+$/.test(licenseNum)) {
-            console.log('car');
-            if (licenseNum.includes("08") &&  !licenseNum.slice(1, 2).includes("01")) return 'Car'
+            if (licenseNum.includes("08") && !licenseNum.slice(1, 2).includes("01")) return 'Car'
             else if (licenseNum.slice(1, 3).includes("01")) return 'Electric car'
             else if (firstTwoLetters.includes("80") && (lastLetter.includes("6"))) return 'Truck'
         }
@@ -200,7 +250,7 @@ function averageAirPressure(wheels) {
     const totalAirPressure = wheels.reduce(
         (sum, wheel) => sum + wheel.currAirPress,
         0
-    );
+    )
     const totalMaxAirPressure = wheels.reduce(
         (sum, wheel) => sum + wheel.maxAirPress,
         0
@@ -212,6 +262,8 @@ function averageAirPressure(wheels) {
 }
 
 
+
+
 module.exports = {
     query,
     add,
@@ -221,5 +273,7 @@ module.exports = {
     insertVehicle,
     insertBlackList,
     checkingVehicleType,
-    averageAirPressure
+    averageAirPressure,
+    activateWorkers,
+
 }

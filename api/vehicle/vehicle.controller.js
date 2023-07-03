@@ -71,10 +71,8 @@ async function removeVehicle(req, res) {
 
 async function insertVehicle(req, res) {
   try {
-    console.log(req.body);
     const {  lisenceNum, company,fullname,phoneNumber } = req.body
     const vehicle = await vehicleService.getById(lisenceNum)
-    console.log('insertVehicle',vehicle._id);
     const vehicleInGarage = await garageService.getById(lisenceNum)
 
     if(!vehicle) {

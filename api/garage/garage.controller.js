@@ -3,8 +3,13 @@ const logger = require('../../services/logger.service.js')
 
 async function getGarage(req, res) {
   try {
+    const filterBy = {
+      repairStatus: req.query.repairStatus || '',
+      remainRepairs: req.query.remainRepairs || 2,
+    }
+
     logger.debug('Getting garage')
-    const garage = await garageService.query()
+    const garage = await garageService.query(filterBy)
     res.json(garage)
   } catch (err) {
     logger.error('Failed to get garage', err)
@@ -48,13 +53,11 @@ async function removeVehicle(req, res) {
     res.status(500).send({ err: 'Failed to remove vehicle' })
   }
 }
+
 async function updateVehicle(req, res) {
   try {
-    console.log('updateVehicle');
-
+    const updatedVehicle = await garageService.activateWorkers(req.body)
     console.log('updateVehicle',req.body);
-    const updatedVehicle = await garageService.update(req.body)
-    console.log('updatedVehicletal',updatedVehicle);
     res.json(updatedVehicle)
   } catch (err) {
     logger.error('Failed to update vehicle', err)
@@ -62,9 +65,6 @@ async function updateVehicle(req, res) {
 
   }
 }
-
-
-
 
 
 module.exports = {
