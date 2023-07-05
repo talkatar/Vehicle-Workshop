@@ -1,5 +1,5 @@
 
-const { getRandomInt } = require('../public/services/util.service.js');
+const { getRandomInt } = require('../services/util.service');
 
 
  class Vehicle {
