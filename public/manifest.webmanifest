@@ -8,13 +8,13 @@
 "scope":"/",
     "icons": [
         {
-          "src": "./assets/logo48.png",
+          "src": "./public/assets/logo48.png",
           "sizes": "48x48",
           "type": "image/png"
         },
         
         {
-          "src": "./assets/logo144.png",
+          "src": "./public/assets/logo144.png",
           "sizes": "144x144",
           "type": "image/png"
         }
