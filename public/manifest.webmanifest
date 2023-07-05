@@ -8,13 +8,13 @@
 "scope":"/",
     "icons": [
         {
-          "src": "../public/assets/logo48.png",
+          "src": "https://res.cloudinary.com/dm72lanye/image/upload/v1688567135/xdpnymfnc3fvnsafkexs.png",
           "sizes": "48x48",
           "type": "image/png"
         },
         
         {
-          "src": "../public/assets/logo144.png",
+          "src": "https://res.cloudinary.com/dm72lanye/image/upload/v1688567135/xdpnymfnc3fvnsafkexs.png",
           "sizes": "144x144",
           "type": "image/png"
         }
