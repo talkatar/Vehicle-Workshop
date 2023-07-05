@@ -63,11 +63,10 @@ async function activateWorkers(repairDetails) {
 
 async function update(repairDetails) {
     try {
-        console.log('updategGarage',gGarage);
         const { licenseNum, updatedBatteryLife, updatedFuelQuantity, updatedAirQuantity } = repairDetails
         let vehicle = await getById(licenseNum)
         Object.setPrototypeOf(vehicle, Vehicle.prototype)
-        // let gGarage = (await query())[0]
+        let gGarage = (await query())[0]
         Object.setPrototypeOf(gGarage, Garage.prototype)
         vehicle.repairStatus = "On Progress"
 
