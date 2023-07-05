@@ -1,1 +1,20 @@
-{"name":"vite-project","short_name":"vite-project","start_url":"/","display":"standalone","background_color":"#ffffff","lang":"en","scope":"/"}
+{"name":"Vehicle Workshop ",
+"short_name":"Vehicle Workshop",
+"start_url":"/",
+"display":"standalone",
+"background_color":"#ffffff",
+"lang":"en",
+"scope":"/",
+    "icons": [
+        {
+          "src": "./assets/Garage-Icon.png",
+          "sizes": "48x48",
+          "type": "image/png"
+        },
+        {
+          "src": "./assets/Garage-Icon.png",
+          "sizes": "144x144",
+          "type": "image/png"
+        }
+      ]
+    }
