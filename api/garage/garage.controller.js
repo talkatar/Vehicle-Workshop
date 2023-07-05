@@ -10,6 +10,7 @@ async function getGarage(req, res) {
 
     logger.debug('Getting garage')
     const garage = await garageService.query(filterBy)
+    console.log(garage);
     res.json(garage)
   } catch (err) {
     logger.error('Failed to get garage', err)
