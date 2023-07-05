@@ -8,13 +8,13 @@
 "scope":"/",
     "icons": [
         {
-          "src": "./assets/Garage-Icon48.png",
+          "src": "./assets/garageiconcircle48.png",
           "sizes": "48x48",
           "type": "image/png"
         },
         
         {
-          "src": "./assets/Garage-Icon144.png",
+          "src": "./assets/garageiconcircle144.png",
           "sizes": "144x144",
           "type": "image/png"
         }
