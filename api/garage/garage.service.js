@@ -48,8 +48,8 @@ async function activateWorkers(repairDetails) {
             gGarage = { ...garage }
             Object.setPrototypeOf(gGarage, Garage.prototype)
         }
-        console.log('activateWorkers',gGarage)
 
+        
         await gGarage.checkingAvailability(repairDetails)
         return  await gGarage.assignWorker(repairDetails)
 
