@@ -29,7 +29,7 @@ async function query(filterBy) {
         if (!gGarage) {
             gGarage = { ...garage[0] }
             Object.setPrototypeOf(gGarage, Garage.prototype)
-            console.log('query',gGarage);
+            // console.log('query',gGarage);
 
         }
         return garage
@@ -85,7 +85,7 @@ async function update(repairDetails) {
                 }
                 catch {
                     vehicle.wheels.forEach(wheel => wheel.currAirPress = 0)
-                     wheel.inflateWheel(vehicle.wheels[0].maxAirPress)
+                    vehicle.wheels.forEach(wheel => wheel.inflateWheel(wheel.maxAirPress))
                     const newTire = 350
                     vehicle.repairPrice += newTire * numWheels + parseInt(vehicle.wheels[0].maxAirPress, 10) * 0.1
                 }
@@ -100,6 +100,7 @@ async function update(repairDetails) {
         }
 
         if (updatedFuelQuantity && gGarage.numOfFuelStations) {
+        console.log("Fuel station");
             vehicle.repairStatus = "Fuel station"
             gGarage.numOfFuelStations--
              vehicle.refuelVehicle(updatedFuelQuantity)
@@ -109,6 +110,7 @@ async function update(repairDetails) {
         }
 
         else if (updatedBatteryLife && gGarage.numOfChargingStations) {
+            console.log("Charging station");
             vehicle.repairStatus = "Charging station"
             gGarage.numOfChargingStations--
              vehicle.refuelVehicle(updatedBatteryLife)
@@ -118,15 +120,16 @@ async function update(repairDetails) {
         }
 
         if (!vehicle.remainRepairs) vehicle.repairStatus = "Ready"
+        gGarage.numOfWorkers++
+        const collection = await dbService.getCollection('garage')
+        await collection.updateOne({ 'vehicles.licenseNum': vehicle.licenseNum }, { $set: { 'vehicles.$': vehicle } })
+
         if(!updatedBatteryLife&&!updatedAir||!updatedFuelQuantity&&!updatedAir){
-            const collection = await dbService.getCollection('garage')
-            await collection.updateOne({ 'vehicles.licenseNum': vehicle.licenseNum }, { $set: { 'vehicles.$': vehicle } })
             return vehicle
 
         }
 
         else  {
-            gGarage.numOfWorkers--
             gGarage.checkingAvailability(repairDetails)
         }
 

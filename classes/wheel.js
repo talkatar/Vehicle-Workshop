@@ -6,14 +6,12 @@
         this.maxAirPress = maxAirPress
     }
 
-
-    sleep(ms) {
+ //sync func version
+     sleep(ms) {
       const start = Date.now()
       while (Date.now() - start < ms) {
     }}
 
- //sync func version
-    
       inflateWheel(quantity) {
         this.repairStatus = "Inflation station"
       const delayMs = quantity * 500
@@ -27,7 +25,9 @@
       }
     }
 
-        //async func version
+
+     //async func version
+
     // inflateWheel(updatedAirPress) {
     //     const deltaAir = updatedAirPress - this.currAirPress
     //     return new Promise((resolve,reject) => {
@@ -45,6 +45,10 @@
     //   })
     //   }
 
+
+   
+
+   
 
 
 

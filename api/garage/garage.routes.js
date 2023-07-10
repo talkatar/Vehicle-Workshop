@@ -11,7 +11,7 @@ router.get('/', log, getGarage)
 router.post('/', requireAuth, addGarage)
 router.get('/:id', getVehicleById)
 router.delete('/:id',  removeVehicle)
-router.put('/', requireAuth, updateVehicle)
+router.put('/', updateVehicle)
 
 
 module.exports = router

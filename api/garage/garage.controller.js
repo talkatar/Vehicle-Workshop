@@ -46,6 +46,7 @@ async function getVehicleById(req, res) {
 
 async function removeVehicle(req, res) {
   try {
+    console.log('remove');
     const vehicleId = req.params.id
     const removedId = await garageService.remove(vehicleId)
     res.send(removedId)
@@ -55,18 +56,31 @@ async function removeVehicle(req, res) {
   }
 }
 
-async function updateVehicle(req, res) {
-  try {
-    const updatedVehicle = await garageService.activateWorkers(req.body)
-    console.log('updateVehicle',req.body);
-    res.json(updatedVehicle)
-  } catch (err) {
-    logger.error('Failed to update vehicle', err)
-    res.status(500).send({ err: 'Failed to update vehicle' })
+// async function updateVehicle(req, res) {
+//   try {
+//     console.log('function updateVehicle');
 
-  }
+//     const updatedVehicle = await garageService.activateWorkers(req.body)
+//     console.log('updateVehicle',req.body);
+//     res.json(updatedVehicle)
+//   } catch (err) {
+//     logger.error('Failed to update vehicle', err)
+//     res.status(500).send({ err: 'Failed to update vehicle' })
+
+//   }
+// }
+function updateVehicle(req, res) {
+  console.log('function updateVehicle')
+  garageService.activateWorkers(req.body)
+    .then(updatedVehicle => {
+      console.log('updateVehicle', req.body)
+      res.json(updatedVehicle);
+    })
+    .catch(err => {
+      console.error('Failed to update vehicle', err);
+      res.status(500).send({ err: 'Failed to update vehicle' });
+    })
 }
-
 
 module.exports = {
   addGarage,

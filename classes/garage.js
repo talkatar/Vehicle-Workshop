@@ -22,8 +22,8 @@ class Garage {
     try {
       const { updatedBatteryLife, updatedFuelQuantity, updatedAirQuantity } = repairDetails
       if (!this.numOfChargingStations && !this.numOfFuelStations && !this.numOfInflationStations || !this.numOfWorkers) {
+        setTimeout(() => this.checkingAvailability(repairDetails),2500)
         release()
-        setTimeout(() => this.checkingAvailability(repairDetails), 2500)
       }
 
       if (updatedAirQuantity && this.numOfInflationStations) {
@@ -41,8 +41,10 @@ class Garage {
         this.numOfWorkers--
       }
 
-      else setTimeout(() => this.checkingAvailability(repairDetails), 2500)
-    }
+      else {
+        setTimeout(() => this.checkingAvailability(repairDetails),2500)
+        release()
+      }}
 
     catch {
       throw new Error('Failed to checking availability');
@@ -50,7 +52,7 @@ class Garage {
 
   }
 
-  assignWorker(repairDetails) {
+  async assignWorker(repairDetails) {
     console.log('assignWorker');
     return new Promise((resolve, reject) => {
       const worker = new Worker('./worker.js', { workerData: { repairDetails } })

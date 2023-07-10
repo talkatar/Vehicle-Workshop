@@ -16,39 +16,43 @@ const { getRandomInt } = require('../services/util.service');
     }
 
 
-     sleep(ms) {
+
+
+ ///sync func
+
+   sleep(ms) {
       const start = Date.now()
       while (Date.now() - start < ms) {
     }}
 
 
- ///sync func
+
     refuelVehicle(quantity) {
 
         var delay = null
         var retries = 0
 
   
-          if (this.currFuelQuantity) {
+          if (this.currFuelQuantity>=0) {
             delay = 250
             try {
               this.repairPrice += parseInt(quantity, 10) * 5
               this.currFuelQuantity += parseInt(quantity, 10)
               this.energyPerc = 100 * (this.currFuelQuantity / this.tankCapacity)
               if (this.currFuelQuantity === this.tankCapacity) this.remainRepairs--
-
               console.log('before delay',quantity)
               this.sleep(quantity * delay)
               console.log('after delay',quantity);
-              retries = 0
+            //   retries = 0
+            //  return
+            }
 
-      return 
-      // Promise.resolve()
-            } catch {
+             catch {
               if (retries < 2) {
                 retries++
               const cleaningDirt = 25
-              this.repairPrice += cleaningDirt
+              this.repairPrice = cleaningDirt
+              this.currFuelQuantity=0
                this.refuelVehicle(this.tankCapacity)}
                else {
                 throw new Error('Failed to refuel vehicle')
@@ -64,8 +68,8 @@ const { getRandomInt } = require('../services/util.service');
               console.log('before delay',quantity)
               this.sleep(quantity * delay)
               console.log('after delay',quantity)
-              retries = 0
-        return
+        //       retries = 0
+        // return
         //  Promise.resolve()
             } 
             catch {
@@ -73,11 +77,12 @@ const { getRandomInt } = require('../services/util.service');
              retries++
               const randomQuantity = this.getRandomInt(this.currBatteryLife, this.maxBatteryLife)
               const newBattery = 1500
-              this.repairPrice += newBattery
+              this.repairPrice = newBattery
+              this.currBatteryLife=0
                this.refuelVehicle(randomQuantity)
             }
             else {
-              throw new Error('Failed to charging vehicle');
+              throw new Error('Failed to charging vehicle')
             }
           }
         }
@@ -90,6 +95,9 @@ const { getRandomInt } = require('../services/util.service');
         }
     
     //////////async func version
+
+
+ 
 
     // refuelVehicle(quantity) {
     //     return new Promise((resolve) => {
