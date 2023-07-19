@@ -5,7 +5,7 @@ async function getGarage(req, res) {
   try {
     const filterBy = {
       repairStatus: req.query.repairStatus || '',
-      remainRepairs: req.query.remainRepairs || 2,
+      remainRepairs: req.query.remainRepairs || null,
     }
 
     logger.debug('Getting garage')
@@ -19,7 +19,6 @@ async function getGarage(req, res) {
 }
 
 async function addGarage(req, res) {
-
   try {
     const addedGarage = await garageService.add(req.body)
     console.log(addedGarage);
@@ -29,8 +28,6 @@ async function addGarage(req, res) {
     res.status(500).send({ err: 'Failed to add garage' })
   }
 }
-
-
 
 async function getVehicleById(req, res) {
   try {
@@ -42,7 +39,6 @@ async function getVehicleById(req, res) {
     res.status(500).send({ err: 'Failed to get vehicle' })
   }
 }
-
 
 async function removeVehicle(req, res) {
   try {
@@ -59,7 +55,6 @@ async function removeVehicle(req, res) {
 // async function updateVehicle(req, res) {
 //   try {
 //     console.log('function updateVehicle');
-
 //     const updatedVehicle = await garageService.activateWorkers(req.body)
 //     console.log('updateVehicle',req.body);
 //     res.json(updatedVehicle)

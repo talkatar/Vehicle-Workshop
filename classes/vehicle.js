@@ -94,6 +94,8 @@ const { getRandomInt } = require('../services/util.service');
           return Math.floor(Math.random() * (max - min + 1)) + min
         }
     
+
+        
     //////////async func version
 
 

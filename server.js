@@ -26,7 +26,6 @@ const userRoutes = require('./api/user/user.routes')
 const vehicleRoutes = require('./api/vehicle/vehicle.routes')
 const garageRoutes = require('./api/garage/garage.routes')
 
-const {setupSocketAPI} = require('./services/socket.service')
 
 // routes
 const setupAsyncLocalStorage = require('./middlewares/setupAls.middleware')
@@ -36,11 +35,9 @@ app.use('/api/user', userRoutes)
 app.use('/api/vehicle', vehicleRoutes)
 app.use('/api/garage', garageRoutes)
 
-setupSocketAPI(http)
 
 // Make every server-side-route to match the index.html
-// so when requesting http://localhost:3030/index.html/car/123 it will still respond with
-// our SPA (single page app) (the index.html file) and allow vue/react-router to take it from there
+
 app.get('/**', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })

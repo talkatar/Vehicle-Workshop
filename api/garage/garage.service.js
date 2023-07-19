@@ -18,8 +18,10 @@ async function query(filterBy) {
                 const regex = new RegExp(filterBy.repairStatus, 'i')
                 garage[0].vehicles = garage[0].vehicles.filter(vehicle => regex.test(vehicle.repairStatus))
             }
-
-            if (filterBy.remainRepairs !== undefined) {
+            if (!filterBy.remainRepairs) {
+                garage[0].vehicles = garage[0].vehicles
+            }
+            else {
                 garage[0].vehicles = garage[0].vehicles.filter(
                     vehicle => vehicle.remainRepairs === +filterBy.remainRepairs)
             }
@@ -44,14 +46,15 @@ async function query(filterBy) {
 async function activateWorkers(repairDetails) {
     try {
         if (!gGarage) {
+
             let garage = (await query())[0]
             gGarage = { ...garage }
             Object.setPrototypeOf(gGarage, Garage.prototype)
         }
 
-        
+        Object.setPrototypeOf(gGarage, Garage.prototype)
         await gGarage.checkingAvailability(repairDetails)
-        return  await gGarage.assignWorker(repairDetails)
+        return await gGarage.assignWorker(repairDetails)
 
     }
 
@@ -81,7 +84,7 @@ async function update(repairDetails) {
                 Object.setPrototypeOf(wheel, Wheel.prototype)
                 vehicle.repairPrice += parseInt(updatedAirQuantity, 10) * 0.1
                 try {
-                     wheel.inflateWheel(updatedAirQuantity)
+                    wheel.inflateWheel(updatedAirQuantity)
                 }
                 catch {
                     vehicle.wheels.forEach(wheel => wheel.currAirPress = 0)
@@ -92,7 +95,7 @@ async function update(repairDetails) {
             }
             vehicle.repairStatus = "On Progress"
             repairDetails.updatedAirQuantity = 0
-            var updatedAir=0
+            var updatedAir = 0
 
             gGarage.numOfInflationStations++
             if (vehicle.wheels[0].currAirPress === vehicle.wheels[0].maxAirPress) vehicle.remainRepairs--
@@ -100,10 +103,10 @@ async function update(repairDetails) {
         }
 
         if (updatedFuelQuantity && gGarage.numOfFuelStations) {
-        console.log("Fuel station");
+            console.log("Fuel station");
             vehicle.repairStatus = "Fuel station"
             gGarage.numOfFuelStations--
-             vehicle.refuelVehicle(updatedFuelQuantity)
+            vehicle.refuelVehicle(updatedFuelQuantity)
             repairDetails.updatedFuelQuantity = 0
             gGarage.numOfFuelStations++
             vehicle.repairStatus = "On Progress"
@@ -113,7 +116,7 @@ async function update(repairDetails) {
             console.log("Charging station");
             vehicle.repairStatus = "Charging station"
             gGarage.numOfChargingStations--
-             vehicle.refuelVehicle(updatedBatteryLife)
+            vehicle.refuelVehicle(updatedBatteryLife)
             repairDetails.updatedFuelQuantity = 0
             gGarage.numOfChargingStations++
             vehicle.repairStatus = "On Progress"
@@ -124,13 +127,13 @@ async function update(repairDetails) {
         const collection = await dbService.getCollection('garage')
         await collection.updateOne({ 'vehicles.licenseNum': vehicle.licenseNum }, { $set: { 'vehicles.$': vehicle } })
 
-        if(!updatedBatteryLife&&!updatedAir||!updatedFuelQuantity&&!updatedAir){
+        if (!updatedBatteryLife && !updatedAir || !updatedFuelQuantity && !updatedAir) {
             return vehicle
 
         }
 
-        else  {
-            gGarage.checkingAvailability(repairDetails)
+        else {
+            activateWorkers(repairDetails)
         }
 
     }
